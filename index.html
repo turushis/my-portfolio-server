@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>我的作品展示</title>
+  <style>
+    body { font-family: sans-serif; padding: 2em; }
+    .work { margin-bottom: 20px; border-bottom: 1px solid #ccc; padding-bottom: 1em; }
+    img { max-width: 200px; display: block; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h1>我的作品展示</h1>
+  <div id="works"></div>
+
+  <script>
+    fetch('http://localhost:3000/api/works')
+      .then(res => res.json())
+      .then(data => {
+        const container = document.getElementById('works');
+        if (data.length === 0) {
+          container.innerHTML = '<p>还没有上传的作品。</p>';
+          return;
+        }
+        data.forEach(work => {
+          const div = document.createElement('div');
+          div.className = 'work';
+          div.innerHTML = `
+            <h3>${work.title}</h3>
+            <p>${work.description || ''}</p>
+            ${work.image ? `<img src="http://localhost:3000/uploads/${work.image}" alt="${work.title}" />` : ''}
+             <button onclick="deleteWork(${work.id})" style="margin-top:10px;">删除</button>
+            `;
+
+          container.appendChild(div);
+        });
+      })
+      .catch(err => {
+        console.error('获取作品失败:', err);
+        document.getElementById('works').innerHTML = '<p>无法加载作品，请检查服务器是否已启动。</p>';
+      });
+      function deleteWork(id) {
+  if (!confirm('确定要删除这条作品吗？')) return;
+  fetch(`http://localhost:3000/api/works/${id}`, {
+    method: 'DELETE'
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      alert('删除成功');
+      location.reload(); // 刷新页面重新获取数据
+    } else {
+      alert('删除失败');
+    }
+  })
+  .catch(err => {
+    console.error('删除出错:', err);
+    alert('网络错误，删除失败');
+  });
+}
+
+  </script>
+  
+</body>
+</html>
