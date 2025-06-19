@@ -35,7 +35,7 @@ router.post('/', upload.single('image'), (req, res) => {
         if (err) {
             return res.status(500).json({ error: err.message }); // 返回错误
         }
-        res.json({ id: this.lastID });  // 返回新建作品的 ID
+        res.json({ success: true, id: this.lastID });  // 返回新建作品的 ID
     });
 });
 
